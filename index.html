@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R&E · Our Love Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* =============================================
+           CSS VARIABLES — set by JS from data.json
+           ============================================= */
+        :root {
+            --bg-primary: #403F6F;
+            --bg-secondary: #3f4b6f;
+            --bg-card: #2c344e;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-warm: #c9a58f;
+            --accent-gold: #ffba08;
+            --accent-pink: #ef476f;
+            --accent-blue: #58a6ff;
+            --transition-speed: 0.6s;
+            --max-width: 1100px;
+            --spacing-unit: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            padding-bottom: 120px;
+            overflow-x: hidden;
+        }
+
+        img { display: block; max-width: 100%; height: auto; }
+        a { color: var(--accent-blue); text-decoration: none; }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 calc(var(--spacing-unit) * 4);
+        }
+
+        /* =============================================
+           SCROLLBAR
+           ============================================= */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-warm); border-radius: 4px; }
+
+        /* =============================================
+           FADE-IN ON SCROLL
+           ============================================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* =============================================
+           COUNTER BAR
+           ============================================= */
+        .counter-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color var(--transition-speed) ease;
+        }
+        .counter-bar-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .counter-logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            color: var(--accent-gold);
+            user-select: none;
+        }
+        .counter-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            align-items: center;
+        }
+        .counter-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+        .counter-stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .counter-stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            position: fixed;
+            bottom: 130px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: color-mix(in srgb, var(--bg-card) 90%, transparent);
+            backdrop-filter: blur(8px);
+            padding: 12px 8px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: background-color var(--transition-speed) ease;
+        }
+        .theme-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-dot:hover { transform: scale(1.2); }
+        .theme-dot.active { border-color: var(--text-primary); box-shadow: 0 0 12px rgba(255,255,255,0.2); }
+
+        /* =============================================
+           HERO
+           ============================================= */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 100px 0 60px;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-warm) 8%, transparent) 0%, transparent 70%);
+            pointer-events: none;
+            transition: background var(--transition-speed) ease;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .hero-initials {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-warm), var(--accent-gold), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 20px;
+            opacity: 0.6;
+            letter-spacing: 8px;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: calc(var(--spacing-unit) * 3);
+            color: var(--text-primary);
+        }
+        .hero-subtitle {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .hero-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-warm), var(--accent-gold));
+            margin: calc(var(--spacing-unit) * 6) auto 0;
+        }
+        .hero-see-more {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 1.8rem;
+            animation: bounce-down 2s ease-in-out infinite;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        @keyframes bounce-down {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+            50% { transform: translateX(-50%) translateY(12px); opacity: 1; }
+        }
+
+        /* =============================================
+           TIMELINE
+           ============================================= */
+        .timeline {
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent-warm), var(--accent-gold), transparent);
+            opacity: 0.3;
+        }
+        .timeline-entry {
+            position: relative;
+            padding: 40px 0;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            border: 3px solid var(--bg-primary);
+            z-index: 5;
+            top: 50px;
+            box-shadow: 0 0 20px rgba(255,186,8,0.3);
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        .timeline-card {
+            width: 45%;
+            position: relative;
+        }
+        .timeline-entry:nth-child(odd) .timeline-card {
+            margin-left: auto;
+        }
+        .timeline-entry:nth-child(even) .timeline-card {
+            margin-right: auto;
+        }
+
+        .monthsary-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        .monthsary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+
+        .monthsary-header {
+            padding: 32px 32px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .monthsary-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .monthsary-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .monthsary-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 8px;
+        }
+
+        .monthsary-body {
+            padding: 24px 32px 32px;
+        }
+
+        /* Letter */
+        .letter-section {
+            margin-bottom: 24px;
+        }
+        .letter-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-weight: 400;
+            padding: 20px;
+            background: color-mix(in srgb, var(--bg-secondary) 50%, transparent);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent-warm);
+            position: relative;
+        }
+        .letter-text::before {
+            content: '"';
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--accent-warm);
+            opacity: 0.3;
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            line-height: 1;
+        }
+        .letter-signoff {
+            font-family: 'Dancing Script', cursive;
+            text-align: right;
+            margin-top: 12px;
+            color: var(--accent-gold);
+            font-size: 1rem;
+        }
+
+        /* Gallery inside card */
+        .card-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .card-gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 10px;
+            cursor: pointer;
+            background: var(--bg-secondary);
+        }
+        .card-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .card-gallery-item:hover img {
+            transform: scale(1.08);
+        }
+        .card-gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            font-size: 0.72rem;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Dreams mini */
+        .dreams-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .dreams-mini-col h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-warm);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .dreams-mini-col ul {
+            list-style: none;
+        }
+        .dreams-mini-col li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dreams-mini-col li::before {
+            content: '✦';
+            color: var(--accent-gold);
+            font-size: 0.65rem;
+        }
+
+        /* Song list mini */
+        .song-list-mini {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .song-chip {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: color-mix(in srgb, var(--bg-secondary) 60%, transparent);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .song-chip::before {
+            content: '♪';
+            color: var(--accent-gold);
+        }
+
+        /* Spotify embed mini */
+        .spotify-mini {
+            margin-top: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .spotify-mini iframe {
+            border-radius: 12px;
+            width: 100%;
+            height: 80px;
+        }
+
+        /* =============================================
+           SECTION HEADERS (in timeline)
+           ============================================= */
+        section {
+            padding: calc(var(--spacing-unit) * 12) 0;
+        }
+        .section-header {
+            margin-bottom: calc(var(--spacing-unit) * 8);
+        }
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-warm);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+            font-weight: 400;
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           OUR SONG WALL
+           ============================================= */
+        .song-wall {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .song-wall-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s ease, background-color var(--transition-speed) ease;
+        }
+        .song-wall-card:hover {
+            transform: translateY(-3px);
+        }
+        .song-wall-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .song-wall-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .song-wall-monthsary {
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            margin-top: 6px;
+        }
+
+        /* =============================================
+           FLOATING DECORATIONS
+           ============================================= */
+        .floating-deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.12;
+            transition: opacity 0.5s ease;
+        }
+        .floating-deco img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* =============================================
+           SPARKLE TRAIL
+           ============================================= */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 12px;
+            animation: sparkle-fade 1.2s ease-out forwards;
+        }
+        @keyframes sparkle-fade {
+            0% { opacity: 1; transform: translate(0,0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+        }
+
+        /* =============================================
+           FOOTER
+           ============================================= */
+        .footer {
+            padding: calc(var(--spacing-unit) * 12) 0;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: calc(var(--spacing-unit) * 4);
+        }
+        .footer-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 calc(var(--spacing-unit) * 4);
+        }
+        .footer-hearts {
+            font-size: 2rem;
+            animation: pulse-heart 2s ease-in-out infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes pulse-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .footer-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            font-family: 'Dancing Script', cursive;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .footer-signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-top: 16px;
+        }
+
+        /* =============================================
+           LIGHTBOX
+           ============================================= */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: calc(var(--spacing-unit) * 4);
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 85vh;
+            position: relative;
+        }
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            transition: color 0.2s;
+        }
+        .lightbox-close:hover { color: var(--text-primary); }
+        .lightbox-caption {
+            text-align: center;
+            margin-top: calc(var(--spacing-unit) * 3);
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           MUSIC PLAYER
+           ============================================= */
+        .music-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            z-index: 999;
+            padding: 10px 20px;
+            transition: background-color var(--transition-speed) ease;
+        }
+        .player-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .track-info {
+            flex: 0 0 180px;
+            min-width: 0;
+        }
+        @media (max-width: 768px) { .track-info { flex: 0 0 auto; max-width: 120px; } }
+        .track-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .track-artist {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: center;
+        }
+        .control-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .control-btn:hover { color: var(--text-primary); }
+        .control-btn--primary {
+            width: 40px;
+            height: 40px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .control-btn--primary:hover {
+            background: var(--accent-warm);
+            color: white;
+            transform: scale(1.05);
+        }
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 18px;
+        }
+        .visualizer-bar {
+            width: 3px;
+            background: linear-gradient(to top, var(--accent-warm), var(--accent-gold));
+            animation: visualize 0.8s ease-in-out infinite;
+        }
+        .visualizer-bar:nth-child(1) { height: 60%; animation-delay: 0s; }
+        .visualizer-bar:nth-child(2) { height: 100%; animation-delay: 0.1s; }
+        .visualizer-bar:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+        .visualizer-bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
+        .visualizer.paused .visualizer-bar {
+            animation-play-state: paused;
+            height: 30% !important;
+        }
+        @keyframes visualize {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.4); }
+        }
+        .progress-container {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+        }
+        @media (max-width: 768px) { .progress-container { display: none; } }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            position: relative;
+            border-radius: 2px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-warm), var(--accent-gold));
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 2px;
+        }
+        .time-display {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            min-width: 36px;
+        }
+        .time-display:last-child { text-align: right; }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 100px;
+        }
+        @media (max-width: 968px) { .volume-control { display: none; } }
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            appearance: none;
+            outline: none;
+            border-radius: 2px;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .playlist-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .playlist-toggle:hover { color: var(--text-primary); }
+        .playlist-dropdown {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px 12px 0 0;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .playlist-dropdown.active { display: block; }
+        .playlist-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            font-size: 0.85rem;
+        }
+        .playlist-item:hover { background: color-mix(in srgb, var(--bg-secondary) 50%, transparent); }
+        .playlist-item.active { background: color-mix(in srgb, var(--accent-warm) 15%, transparent); color: var(--text-primary); }
+        .playlist-item .pl-num { color: var(--text-muted); font-size: 0.75rem; min-width: 24px; }
+        .playlist-item .pl-title { flex: 1; }
+        .playlist-item .pl-artist { color: var(--text-muted); font-size: 0.75rem; }
+        .playlist-item .pl-playing { color: var(--accent-gold); font-size: 0.7rem; display: none; }
+        .playlist-item.active .pl-playing { display: inline; }
+
+        /* =============================================
+           RESPONSIVE
+           ============================================= */
+        @media (max-width: 768px) {
+            .container { padding: 0 calc(var(--spacing-unit) * 3); }
+            .timeline::before { left: 20px; }
+            .timeline-marker { left: 20px; }
+            .timeline-card { width: calc(100% - 50px); margin-left: 50px !important; }
+            .monthsary-header { padding: 20px 20px 16px; }
+            .monthsary-body { padding: 16px 20px 24px; }
+            .card-gallery { grid-template-columns: repeat(2, 1fr); }
+            .dreams-mini { grid-template-columns: 1fr; }
+            .counter-stats { gap: 12px; }
+            .counter-stat { min-width: 40px; }
+            .counter-stat-value { font-size: 0.9rem; }
+            .counter-stat-label { font-size: 0.55rem; }
+            .theme-switcher { bottom: 100px; right: 10px; padding: 8px 6px; }
+            .theme-dot { width: 22px; height: 22px; }
+            .hero-initials { font-size: clamp(3rem, 10vw, 5rem); }
+            .song-wall { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== COUNTER BAR ========== -->
+<header class="counter-bar" id="counterBar">
+    <div class="counter-bar-inner">
+        <div class="counter-logo" id="logoDisplay">R&amp;E</div>
+        <div class="counter-stats" id="counterStats">
+            <div class="counter-stat">
+                <span class="counter-stat-value" id="daysCount">0</span>
+                <span class="counter-stat-label">Days Together</span>
+            </div>
+            <div class="counter-stat">
+                <span class="counter-stat-value" id="monthsCount">0</span>
+                <span class="counter-stat-label">Monthsaries</span>
+            </div>
+            <div class="counter-stat">
+                <span class="counter-stat-value" id="photosCount">0</span>
+                <span class="counter-stat-label">Photos</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ========== THEME SWITCHER ========== -->
+<div class="theme-switcher" id="themeSwitcher"></div>
+
+<!-- ========== FLOATING DECORATIONS ========== -->
+<div class="floating-deco" id="decoTigger">
+    <img src="images/tigger-giggling.png" alt="">
+</div>
+<div class="floating-deco" id="decoPucca">
+    <img src="images/pucca.png" alt="">
+</div>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-content container">
+        <div class="hero-initials" id="heroInitials">R&amp;E</div>
+        <h1 class="hero-title" id="heroTitle">HAPPY 15TH MONTHSARY BABY</h1>
+        <p class="hero-subtitle" id="heroSubtitle">A YEAR AND 3 MONTHS OF LOVE AND ADVENTURE</p>
+        <div class="hero-line"></div>
+    </div>
+    <div class="hero-see-more" onclick="document.getElementById('timelineStart').scrollIntoView({behavior:'smooth'})">⌄</div>
+</section>
+
+<!-- ========== TIMELINE ========== -->
+<section id="timelineStart">
+    <div class="container">
+        <div class="section-header reveal">
+            <p class="section-label">Our Story</p>
+            <h2 class="section-title">Every Monthsary, Every Memory</h2>
+        </div>
+        <div class="timeline" id="timelineContainer"></div>
+    </div>
+</section>
+
+<!-- ========== OUR SONGS WALL ========== -->
+<section id="songWallSection" class="reveal">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-label">Our Soundtrack</p>
+            <h2 class="section-title">Songs That Tell Our Story</h2>
+        </div>
+        <div class="song-wall" id="songWallContainer"></div>
+    </div>
+</section>
+
+<!-- ========== DREAMS SECTION ========== -->
+<footer class="footer reveal">
+    <div class="footer-inner">
+        <div class="footer-hearts">❤️</div>
+        <p class="footer-text" id="footerMessage">
+            Every monthsary, every memory, every heartbeat — this is our love story, forever growing.
+        </p>
+        <div class="footer-signature">With love, Ajing &hearts; Ri</div>
+    </div>
+</footer>
+
+<!-- ========== LIGHTBOX ========== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+        <img src="" alt="" class="lightbox-image" id="lightboxImg">
+        <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+</div>
+
+<!-- ========== MUSIC PLAYER ========== -->
+<audio id="audioPlayer" preload="metadata"></audio>
+<div class="music-player" id="musicPlayer">
+    <div class="player-inner" style="position:relative">
+        <div class="track-info">
+            <div class="track-title" id="trackTitle">No Song</div>
+            <div class="track-artist" id="trackArtist">—</div>
+        </div>
+        <div class="player-controls">
+            <button class="control-btn" id="prevBtn" title="Previous">⏮</button>
+            <button class="control-btn control-btn--primary" id="playBtn" title="Play/Pause">▶</button>
+            <button class="control-btn" id="nextBtn" title="Next">⏭</button>
+            <div class="visualizer paused" id="visualizer">
+                <div class="visualizer-bar"></div>
+                <div class="visualizer-bar"></div>
+                <div class="visualizer-bar"></div>
+                <div class="visualizer-bar"></div>
+            </div>
+            <button class="playlist-toggle" id="playlistToggle" title="Playlist">☰</button>
+            <div class="playlist-dropdown" id="playlistDropdown"></div>
+        </div>
+        <div class="progress-container">
+            <span class="time-display" id="currentTime">0:00</span>
+            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+            <span class="time-display" id="duration">0:00</span>
+        </div>
+        <div class="volume-control">
+            <button class="control-btn" id="muteBtn">🔊</button>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+        </div>
+    </div>
+</div>
+
+<!-- ========== JAVASCRIPT ========== -->
+<script>
+// =============================================
+// DATA
+// =============================================
+const DATA = {
+  "couple": {"name1":"Ajing","name2":"Ansan","name1_alt":"El","name2_alt":"Ri","start_date":"2025-02-14","initials":"R&E"},
+  "themes": {
+    "default": "purple",
+    "options": {
+      "purple":{"name":"Royal Purple","bg_primary":"#403F6F","bg_secondary":"#3f4b6f","bg_card":"#2c344e","text_primary":"#e6edf3","text_secondary":"#8b949e","text_muted":"#6e7681","accent_warm":"#c9a58f","accent_gold":"#ffba08","accent_pink":"#ef476f","accent_blue":"#58a6ff"},
+      "pink":{"name":"Blush Pink","bg_primary":"#4a2c4a","bg_secondary":"#3d2340","bg_card":"#2e1a30","text_primary":"#fce4ec","text_secondary":"#e8b4c8","text_muted":"#b07f96","accent_warm":"#f4a4c4","accent_gold":"#ffd54f","accent_pink":"#ff6b9d","accent_blue":"#80cbc4"},
+      "gold":{"name":"Golden Hour","bg_primary":"#2d2a1a","bg_secondary":"#3a3522","bg_card":"#272418","text_primary":"#fff8e1","text_secondary":"#e6ce8c","text_muted":"#a8925e","accent_warm":"#e6c27a","accent_gold":"#ffd54f","accent_pink":"#ff8a65","accent_blue":"#81d4fa"},
+      "rose":{"name":"Rose Garden","bg_primary":"#3d1f26","bg_secondary":"#4a2630","bg_card":"#311a20","text_primary":"#fce4ec","text_secondary":"#d4a0b0","text_muted":"#a07080","accent_warm":"#e8a0b0","accent_gold":"#f0c060","accent_pink":"#e04070","accent_blue":"#90b4c8"},
+      "ocean":{"name":"Deep Ocean","bg_primary":"#1a2a3d","bg_secondary":"#1e3450","bg_card":"#162030","text_primary":"#e0f0ff","text_secondary":"#88b0d0","text_muted":"#6080a0","accent_warm":"#c0a080","accent_gold":"#f0d060","accent_pink":"#d07090","accent_blue":"#60b8ff"},
+      "emerald":{"name":"Emerald Dream","bg_primary":"#1a2d22","bg_secondary":"#1e3828","bg_card":"#14241a","text_primary":"#e0f5e8","text_secondary":"#88c0a0","text_muted":"#60a080","accent_warm":"#c0b088","accent_gold":"#e0d050","accent_pink":"#d09080","accent_blue":"#70c8c8"}
+    }
+  },
+  "monthsaries": [
+    {"number":1,"date":"2026-04-14","theme":"purple","title":"Happy 14th Monthsary Baby","subtitle":"A year and 2 months of love and adventure","letter":"Made for you my Bao, my partner in crime, my best friend. I know this month we didn't make much memories together. But I hope we can make more memories together in the future. I love you so much and I'm so grateful to have you in my life. Here's to many more months and years of adventures together.","photos":[{"file":"images/14th/1.jfif","caption":"You & Octopus"},{"file":"images/14th/7.jfif","caption":"US TOGETHER"},{"file":"images/14th/5.jfif","caption":"Sleepy You"},{"file":"images/14th/4.jfif","caption":"Octopus On Your Shoulder"},{"file":"images/14th/10.jfif","caption":"You Smiling"},{"file":"images/14th/1.jfif","caption":"Our Moment"},{"file":"images/14th/2.jfif","caption":"Us"},{"file":"images/14th/3.jfif","caption":"Another Memory"},{"file":"images/14th/6.jfif","caption":"Cute Ka Talaga"},{"file":"images/14th/8.jfif","caption":"My Favorite"},{"file":"images/14th/9.jfif","caption":"Beautiful"},{"file":"images/14th/12.jfif","caption":"Precious"},{"file":"images/14th/13.jfif","caption":"My Love"},{"file":"images/14th/11.jfif","caption":"SMILING YOU & OCTOPUS"}],"songs":[{"file":"music/riskitall.mp3","title":"Risk It All","artist":"Bruno Mars"},{"file":"music/snowspring.mp3","title":"Spring Snow","artist":"10CM"},{"file":"music/howl.mp3","title":"Howl","artist":"Joe Hisaishi"}],"dreams_life":["Get a pet together","Cook a full meal from scratch","Learn something new together","Build our home library","Grow old together, still laughing"],"dreams_month":["Rewatch every Studio Ghibli film together","Dance in the rain","Me painting your nails","Create our own traditions","Do something spontaneous together"]},
+    {"number":2,"date":"2026-05-14","theme":"purple","title":"Happy 15th Monthsary Baby","subtitle":"A year and 3 months of love and adventure","letter":"My Ri, my Love, my Bao, my Ansan... 15 months, imagine mo un 15 months. That's 15 months of you making my world brighter just by being in it. I love you more than words can say. Here's to our 15th month, and then forever.","photos":[{"file":"images/15th/1.jfif","caption":"Cutie You"},{"file":"images/15th/2.jfif","caption":"SELFIEE"},{"file":"images/15th/3.jfif","caption":"NEW STYLE WITH LILY"},{"file":"images/15th/4.jfif","caption":"HEY AKO YAN AH"},{"file":"images/15th/5.jfif","caption":"YOUR SO BEAUTIFUL"},{"file":"images/15th/6.jfif","caption":"Hey Baby Girl ;)"},{"file":"images/15th/7.jfif","caption":"US ON A CAMERA YAHU"},{"file":"images/15th/8.jfif","caption":"CUTE MOOOOOOOOO"},{"file":"images/15th/9.jfif","caption":"UY SHOCKED AKO"},{"file":"images/15th/10.jfif","caption":"Me with the number"},{"file":"images/15th/11.jfif","caption":"Uy iusang magsasaka"},{"file":"images/15th/12.jfif","caption":"Precious selfie"},{"file":"images/15th/13.jfif","caption":"CUTIE STYLE ULIT"},{"file":"images/15th/14.jfif","caption":"Uy PFP ko"},{"file":"images/15th/15.jfif","caption":"In love ako lalo ah"}],"songs":[{"file":"music/gugma.mp3","title":"Gugma","artist":"Cedie"},{"file":"music/gustokolamangsabuhay.mp3","title":"Gusto Ko Lamang Sa Buhay","artist":"The Itchyworms"},{"file":"music/mysb.mp3","title":"MSYB (Miss You so Bad)","artist":"Kira, OCDawgs"},{"file":"music/orasan.mp3","title":"Orasan","artist":"HEY JUNE!"},{"file":"music/paraluman.mp3","title":"Paraluman","artist":"Adie"},{"file":"music/pariwara.mp3","title":"Pariwara","artist":"Ely Buendia, The Itchyworms"}],"dreams_life":["Get a pet together","Cook a full meal from scratch","Learn something new together","Build our home library","Grow old together, still laughing"],"dreams_month":["Go on a picnic together","Watch the sunset somewhere beautiful","Take new photos together","Try a new restaurant","Write each other letters"]}
+  ]
+};
+
+// =============================================
+// THEME SYSTEM
+// =============================================
+function applyTheme(themeKey) {
+    const t = DATA.themes.options[themeKey] || DATA.themes.options[DATA.themes.default];
+    const root = document.documentElement;
+    root.style.setProperty('--bg-primary', t.bg_primary);
+    root.style.setProperty('--bg-secondary', t.bg_secondary);
+    root.style.setProperty('--bg-card', t.bg_card);
+    root.style.setProperty('--text-primary', t.text_primary);
+    root.style.setProperty('--text-secondary', t.text_secondary);
+    root.style.setProperty('--text-muted', t.text_muted);
+    root.style.setProperty('--accent-warm', t.accent_warm);
+    root.style.setProperty('--accent-gold', t.accent_gold);
+    root.style.setProperty('--accent-pink', t.accent_pink);
+    root.style.setProperty('--accent-blue', t.accent_blue);
+    localStorage.setItem('re-theme', themeKey);
+}
+
+function initThemeSwitcher() {
+    const container = document.getElementById('themeSwitcher');
+    const saved = localStorage.getItem('re-theme') || DATA.themes.default;
+    Object.entries(DATA.themes.options).forEach(([key, t]) => {
+        const dot = document.createElement('div');
+        dot.className = 'theme-dot' + (key === saved ? ' active' : '');
+        dot.style.background = `linear-gradient(135deg, ${t.accent_warm}, ${t.accent_gold})`;
+        dot.title = t.name;
+        dot.dataset.theme = key;
+        dot.onclick = () => {
+            document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            applyTheme(key);
+        };
+        container.appendChild(dot);
+    });
+    applyTheme(saved);
+}
+
+// =============================================
+// COUNTER
+// =============================================
+function updateCounters() {
+    const start = new Date(DATA.couple.start_date);
+    const now = new Date();
+    const diff = now - start;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const msActive = DATA.monthsaries.filter(m => {
+        const md = new Date(m.date + 'T23:59:59');
+        return md <= now;
+    });
+    const monthsaryCount = msActive.length;
+
+    let totalPhotos = 0;
+    DATA.monthsaries.forEach(m => { if (m.photos) totalPhotos += m.photos.length; });
+
+    // Animate counting
+    animateNumber('daysCount', days);
+    animateNumber('monthsCount', 15);
+    animateNumber('photosCount', totalPhotos);
+
+    document.getElementById('logoDisplay').textContent = DATA.couple.initials;
+}
+
+function animateNumber(elId, target) {
+    const el = document.getElementById(elId);
+    const current = parseInt(el.textContent) || 0;
+    if (current === target) { el.textContent = target; return; }
+    const step = Math.ceil(Math.abs(target - current) / 30);
+    const inc = target > current ? step : -step;
+    let val = current;
+    const interval = setInterval(() => {
+        val += inc;
+        if ((inc > 0 && val >= target) || (inc < 0 && val <= target)) {
+            val = target;
+            clearInterval(interval);
+        }
+        el.textContent = val;
+    }, 30);
+}
+
+// =============================================
+// MONTHSARY RENDERER
+// =============================================
+function ordinal(n) {
+    const s = ['th','st','nd','rd'];
+    const v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function buildTimeline() {
+    const container = document.getElementById('timelineContainer');
+
+    // Sort by date ascending
+    const sorted = [...DATA.monthsaries].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sorted.forEach((m, idx) => {
+        const entry = document.createElement('div');
+        entry.className = 'timeline-entry reveal';
+        entry.style.transitionDelay = (idx * 0.1) + 's';
+
+        // Marker
+        const marker = document.createElement('div');
+        marker.className = 'timeline-marker';
+        entry.appendChild(marker);
+
+        // Card
+        const card = document.createElement('div');
+        card.className = 'timeline-card';
+        card.innerHTML = `
+            <div class="monthsary-card" data-theme="${m.theme || DATA.themes.default}">
+                <div class="monthsary-header">
+                    <div class="monthsary-number">${ordinal(m.number)} Monthsary</div>
+                    <div class="monthsary-date">${formatDate(m.date)}</div>
+                    <div class="monthsary-title">${m.title || 'Happy ' + ordinal(m.number) + ' Monthsary Baby'}</div>
+                </div>
+                <div class="monthsary-body">
+                    ${m.letter ? `
+                    <div class="letter-section">
+                        <div class="letter-text">${m.letter}</div>
+                        <div class="letter-signoff">— ${DATA.couple.name1}</div>
+                    </div>` : ''}
+                    ${m.photos && m.photos.length > 0 ? `
+                    <div class="card-gallery">
+                        ${m.photos.map(p => `
+                        <div class="card-gallery-item" onclick="openLightbox('${p.file.replace(/'/g, "\\'")}', '${p.caption.replace(/'/g, "\\'")}')">
+                            <img src="${p.file}" alt="${p.caption}" loading="lazy">
+                            <div class="card-gallery-caption">${p.caption}</div>
+                        </div>`).join('')}
+                    </div>` : m.number >= 1 ? `
+                    <div class="card-gallery">
+                        ${[1,2,3,4].map(n => `
+                        <div class="card-gallery-item" style="background:color-mix(in srgb, var(--bg-secondary) 50%, transparent); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.8rem;">
+                            📸 Add photos
+                        </div>`).join('')}
+                    </div>` : ''}
+                    ${m.dreams_life && m.dreams_life.length > 0 ? `
+                    <div class="dreams-mini">
+                        <div class="dreams-mini-col">
+                            <h4>Life Dreams</h4>
+                            <ul>${m.dreams_life.map(d => `<li>${d}</li>`).join('')}</ul>
+                        </div>
+                        <div class="dreams-mini-col">
+                            <h4>This Month</h4>
+                            <ul>${(m.dreams_month || []).map(d => `<li>${d}</li>`).join('')}</ul>
+                        </div>
+                    </div>` : ''}
+                    ${m.songs && m.songs.length > 0 ? `
+                    <div class="song-list-mini">
+                        ${m.songs.map(s => `<span class="song-chip">${s.title} — ${s.artist}</span>`).join('')}
+                    </div>` : ''}
+                </div>
+            </div>
+        `;
+        entry.appendChild(card);
+        container.appendChild(entry);
+    });
+}
+
+// =============================================
+// SONG WALL
+// =============================================
+function buildSongWall() {
+    const container = document.getElementById('songWallContainer');
+    const seen = new Set();
+
+    DATA.monthsaries.forEach(m => {
+        if (!m.songs) return;
+        m.songs.forEach(s => {
+            const key = s.title + s.artist;
+            if (seen.has(key)) return;
+            seen.add(key);
+            const card = document.createElement('div');
+            card.className = 'song-wall-card reveal-scale';
+            card.innerHTML = `
+                <div class="song-wall-title">${s.title}</div>
+                <div class="song-wall-meta">${s.artist}</div>
+                <div class="song-wall-monthsary">♫ Monthsary ${m.number}</div>
+            `;
+            container.appendChild(card);
+        });
+    });
+
+    if (seen.size === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;">Add songs to your monthsaries and they\'ll appear here ♪</p>';
+    }
+}
+
+// =============================================
+// LIGHTBOX
+// =============================================
+function openLightbox(src, caption) {
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption || '';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(event) {
+    const lb = document.getElementById('lightbox');
+    if (!event || event.target === lb || event.target.classList.contains('lightbox-close')) {
+        lb.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox({target: document.getElementById('lightbox')});
+});
+
+// =============================================
+// SCROLL REVEAL
+// =============================================
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// =============================================
+// FLOATING DECORATIONS — REAL FLOWING MOTION
+// =============================================
+function initFloatingDecorations() {
+    const tigger = document.getElementById('decoTigger');
+    const pucca = document.getElementById('decoPucca');
+
+    tigger.style.width = '140px';
+    tigger.style.opacity = '0.15';
+    pucca.style.width = '110px';
+    pucca.style.opacity = '0.15';
+
+    let tX = 5, tY = 15; // percent positions
+    let vX = 0.02, vY = 0.015;
+    let pX = 88, pY = 20;
+    let pvX = -0.025, pvY = 0.02;
+    let time = 0;
+
+    function floatLoop() {
+        time += 0.01;
+        // Tigger: gentle sine drift + random perturbation
+        tX += vX + Math.sin(time) * 0.003;
+        tY += vY + Math.cos(time * 1.3) * 0.003;
+        if (tX < 2 || tX > 30) vX *= -1;
+        if (tY < 5 || tY > 50) vY *= -1;
+        tX = Math.max(1, Math.min(32, tX));
+        tY = Math.max(3, Math.min(52, tY));
+
+        // Pucca: opposite direction drift
+        pX += pvX + Math.cos(time * 0.7) * 0.004;
+        pY += pvY + Math.sin(time * 1.1) * 0.003;
+        if (pX < 65 || pX > 93) pvX *= -1;
+        if (pY < 5 || pY > 50) pvY *= -1;
+        pX = Math.max(63, Math.min(95, pX));
+        pY = Math.max(3, Math.min(52, pY));
+
+        // Gentle rotation
+        const tRot = Math.sin(time * 0.5) * 8;
+        const pRot = Math.cos(time * 0.4) * 10;
+
+        tigger.style.cssText += `;bottom:${tY}%;left:${tX}%;transform:rotate(${tRot}deg);`;
+        pucca.style.cssText += `;top:${pY}%;right:${100-pX}%;transform:rotate(${pRot}deg);`;
+
+        requestAnimationFrame(floatLoop);
+    }
+    floatLoop();
+}
+
+// =============================================
+// SPARKLE TRAIL ON MOUSE
+// =============================================
+function initSparkleTrail() {
+    const emojis = ['✨', '⭐', '❤️', '💫', '✦', '💖', '🌟'];
+    let timeout;
+
+    document.addEventListener('mousemove', (e) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            const spark = document.createElement('div');
+            spark.className = 'sparkle';
+            spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            spark.style.left = (e.clientX - 6) + 'px';
+            spark.style.top = (e.clientY - 6) + 'px';
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 30 + Math.random() * 50;
+            spark.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+            spark.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+            document.body.appendChild(spark);
+            setTimeout(() => spark.remove(), 1200);
+        }, 80);
+    });
+}
+
+// =============================================
+// UPDATE HERO TO LATEST MONTHSARY
+// =============================================
+function updateHero() {
+    const latest = DATA.monthsaries[DATA.monthsaries.length - 1];
+    document.getElementById('heroTitle').textContent = latest.title || 'Happy ' + ordinal(latest.number) + ' Monthsary Baby';
+    document.getElementById('heroSubtitle').textContent = latest.subtitle || '';
+    document.getElementById('heroInitials').textContent = DATA.couple.initials;
+
+    // Apply latest monthsary's theme
+    if (latest.theme) {
+        applyTheme(latest.theme);
+        document.querySelectorAll('.theme-dot').forEach(d => {
+            d.classList.toggle('active', d.dataset.theme === latest.theme);
+        });
+    }
+}
+
+// =============================================
+// MUSIC PLAYER
+// =============================================
+let playlist = [];
+let currentTrackIdx = 0;
+let isPlaying = false;
+let allSongs = [];
+
+// Collect all unique songs
+DATA.monthsaries.forEach(m => {
+    if (m.songs) {
+        m.songs.forEach(s => {
+            // Track by file path to avoid dupes
+            if (!allSongs.find(ex => ex.file === s.file)) {
+                allSongs.push({...s, monthsary: m.number});
+            }
+        });
+    }
+});
+
+const audio = document.getElementById('audioPlayer');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progressFill = document.getElementById('progressFill');
+const progressBar = document.getElementById('progressBar');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const volumeSlider = document.getElementById('volumeSlider');
+const muteBtn = document.getElementById('muteBtn');
+const visualizer = document.getElementById('visualizer');
+const trackTitle = document.getElementById('trackTitle');
+const trackArtist = document.getElementById('trackArtist');
+const playlistToggle = document.getElementById('playlistToggle');
+const playlistDropdown = document.getElementById('playlistDropdown');
+
+function initPlayer() {
+    if (allSongs.length === 0) {
+        trackTitle.textContent = 'No songs yet';
+        trackArtist.textContent = 'Add music to data.json';
+        return;
+    }
+
+    playlist = [...allSongs];
+    currentTrackIdx = 0;
+    renderPlaylist();
+    loadTrack(currentTrackIdx);
+
+    playBtn.onclick = togglePlay;
+    prevBtn.onclick = prevTrack;
+    nextBtn.onclick = nextTrack;
+    audio.ontimeupdate = updateProgress;
+    audio.onloadedmetadata = () => {
+        durationEl.textContent = formatTime(audio.duration);
+    };
+    audio.onended = nextTrack;
+
+    progressBar.onclick = (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = pct * audio.duration;
+    };
+
+    volumeSlider.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        audio.volume = v;
+        updateMuteBtn(v, audio.muted);
+    };
+
+    muteBtn.onclick = () => {
+        audio.muted = !audio.muted;
+        updateMuteBtn(audio.muted ? 0 : audio.volume, audio.muted);
+    };
+
+    playlistToggle.onclick = (e) => {
+        e.stopPropagation();
+        playlistDropdown.classList.toggle('active');
+    };
+    document.addEventListener('click', () => playlistDropdown.classList.remove('active'));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === ' ' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            togglePlay();
+        }
+        if (e.key === 'ArrowRight' && e.ctrlKey) nextTrack();
+        if (e.key === 'ArrowLeft' && e.ctrlKey) prevTrack();
+    });
+}
+
+function loadTrack(idx) {
+    if (idx < 0 || idx >= playlist.length) return;
+    currentTrackIdx = idx;
+    const s = playlist[idx];
+    audio.src = s.file;
+    audio.load();
+    trackTitle.textContent = s.title;
+    trackArtist.textContent = `${s.artist}`;
+    document.querySelectorAll('.playlist-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+    });
+    if (isPlaying) {
+        audio.play().catch(() => {});
+    }
+}
+
+function togglePlay() {
+    if (playlist.length === 0) return;
+    if (isPlaying) {
+        audio.pause();
+        playBtn.textContent = '▶';
+        visualizer.classList.add('paused');
+    } else {
+        audio.play().catch(() => {});
+        playBtn.textContent = '⏸';
+        visualizer.classList.remove('paused');
+    }
+    isPlaying = !isPlaying;
+}
+
+function prevTrack() {
+    if (playlist.length === 0) return;
+    if (audio.currentTime > 3) {
+        audio.currentTime = 0;
+        return;
+    }
+    currentTrackIdx = (currentTrackIdx - 1 + playlist.length) % playlist.length;
+    loadTrack(currentTrackIdx);
+    if (!isPlaying) togglePlay();
+    else { audio.play().catch(() => {}); }
+}
+
+function nextTrack() {
+    if (playlist.length === 0) return;
+    currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
+    loadTrack(currentTrackIdx);
+    if (!isPlaying) togglePlay();
+    else { audio.play().catch(() => {}); }
+}
+
+function updateProgress() {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    progressFill.style.width = pct + '%';
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+}
+
+function formatTime(s) {
+    if (isNaN(s) || !isFinite(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + sec.toString().padStart(2, '0');
+}
+
+function updateMuteBtn(vol, muted) {
+    if (muted || vol === 0) muteBtn.textContent = '🔇';
+    else if (vol < 0.5) muteBtn.textContent = '🔉';
+    else muteBtn.textContent = '🔊';
+}
+
+function renderPlaylist() {
+    playlistDropdown.innerHTML = playlist.map((s, i) => `
+        <div class="playlist-item ${i === currentTrackIdx ? 'active' : ''}" onclick="selectTrack(${i})">
+            <span class="pl-num">${i + 1}</span>
+            <span class="pl-title">${s.title}</span>
+            <span class="pl-artist">${s.artist}</span>
+            <span class="pl-playing">▶</span>
+        </div>
+    `).join('');
+}
+
+function selectTrack(idx) {
+    loadTrack(idx);
+    if (!isPlaying) togglePlay();
+    else { audio.play().catch(() => {}); }
+    playlistDropdown.classList.remove('active');
+}
+
+// Export for onclick
+window.selectTrack = selectTrack;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+
+// =============================================
+// INIT
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    initThemeSwitcher();
+    updateCounters();
+    updateHero();
+    buildTimeline();
+    buildSongWall();
+    initPlayer();
+    initScrollReveal();
+    initFloatingDecorations();
+    initSparkleTrail();
+});
+</script>
+</body>
+</html>
